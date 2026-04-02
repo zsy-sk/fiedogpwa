@@ -1,0 +1,48 @@
+{
+  "name": "Field Report PWA",
+  "short_name": "FieldOG",
+  "start_url": "/fiedogpwa-build/",
+  "scope": "/fiedogpwa-build/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e66ff",
+  "icons": [
+    {
+      "src": "/fiedogpwa-build/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/fiedogpwa-build/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/fiedogpwa-build/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/fiedogpwa-build/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/fiedogpwa-build/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/fiedogpwa-build/screenshots/mobile.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ]
+}
