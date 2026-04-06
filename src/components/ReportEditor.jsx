@@ -114,7 +114,7 @@ export default function ReportEditor({ categories, onSave, users }) {
       }
     } catch (error) {
       console.warn('Camera access failed:', error)
-      alert('无法打开摄像头，请检查权限和设备支持。')
+      alert('The camera cannot be opened. Please check the permissions and device support.')
       closeCamera()
     }
   }
