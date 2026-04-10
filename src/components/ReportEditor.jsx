@@ -65,9 +65,15 @@ export default function ReportEditor({ categories, onSave, users }) {
   }
 
  function applyPickedLocation() {
-  if (!pickerPoint) return
-  setGeo(prev => ({ ...prev, lat: pickerPoint.lat, lng: pickerPoint.lng,acc: null}))
-  setLocationModalOpen(false)
+  if (!pickerPoint) return;
+
+  setGeo({
+    lat: pickerPoint.lat,
+    lng: pickerPoint.lng,
+    acc: null
+  });
+
+  setLocationModalOpen(false);
 }
 
   function onOrientation(e) {
