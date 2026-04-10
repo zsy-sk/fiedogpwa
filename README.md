@@ -7,7 +7,7 @@ FieldOG is a Progressive Web Application (PWA) purpose-built for field data coll
 
 1. Clone repository
    - `git clone https://github.com/zsy-sk/fiedogpwa.git`
-   - `cd fiedogpwa-main`
+   - `cd fiedogpwa`
 
 2. Install dependencies
    - `npm install`
