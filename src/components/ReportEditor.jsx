@@ -66,7 +66,7 @@ export default function ReportEditor({ categories, onSave, users }) {
 
  function applyPickedLocation() {
   if (!pickerPoint) return
-  setGeo(prev => ({ ...prev, lat: pickerPoint.lat, lng: pickerPoint.lng, acc: null }))
+  setGeo(prev => ({ ...prev, lat: pickerPoint.lat, lng: pickerPoint.lng,acc: null}))
   setLocationModalOpen(false)
 }
 
