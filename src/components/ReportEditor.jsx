@@ -64,11 +64,11 @@ export default function ReportEditor({ categories, onSave, users }) {
     setLocationModalOpen(true)
   }
 
-  function applyPickedLocation() {
-    if (!pickerPoint) return
-    setGeo(prev => ({ ...prev, lat: pickerPoint.lat, lng: pickerPoint.lng，acc:null}))
-    setLocationModalOpen(false)
-  }
+ function applyPickedLocation() {
+  if (!pickerPoint) return
+  setGeo(prev => ({ ...prev, lat: pickerPoint.lat, lng: pickerPoint.lng, acc: null }))
+  setLocationModalOpen(false)
+}
 
   function onOrientation(e) {
     if (typeof e.alpha === 'number') {
