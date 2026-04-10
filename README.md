@@ -1,4 +1,5 @@
 # FieldOG PWA
+FieldOG is a Progressive Web Application (PWA) purpose-built for field data collection, which integrates device camera, QR code scanning, geolocation, and local storage to support an offline-first workflow. By leveraging multiple hardware APIs, the application provides a robust, installable solution that guarantees uninterrupted data capture and persistence in challenging network conditions.
 
 ## Part A: User Guide
 
@@ -14,6 +15,12 @@
 3. Main dependencies
    - `react`, `react-dom`, `react-scripts`, `vite`
    - `react-leaflet`, `leaflet`, `jsqr`, `@testing-library/*`, etc.
+4.quick start
+1.nmp i
+2. Run `npm run dev`
+3. Open browser at `http://localhost:5173`、
+4. Sign up or log in
+5. Start creating reports
 
 
 ### 2. Run instructions
@@ -33,7 +40,11 @@
 - `src/main.jsx` mounts React app and registers service worker (production & https/localhost only).
 - `public/manifest.webmanifest` startup config:
   - `start_url` set to `./` for GitHub Pages path compatibility.
+## Prerequisites
 
+- Node.js (v16 or above recommended)
+- npm or yarn
+- Modern browser (Chrome recommended for PWA features)
 
 ### 4. Usage steps
 
@@ -45,41 +56,30 @@
    - Sync panel can upload/download data (currently local simulation).
    - `pendingOps` syncs via `syncUpload()` when online.
 5. Delete/update: operate in list view, actions generate pending ops and trigger `syncUpload()`.
-
+6.Permissions Required
+Location Access: Enables real-time route tracking and geotagging for collected field data.
+Camera Access: Facilitates on-site image capture and visual documentation of field reports.
 
 ### 5. GitHub repository link
 
 - GitHub Repo: https://github.com/zsy-sk/fiedogpwa
 
+### 6.Live App
+- Access the live app here:https://fiedogpwa.vercel.app
 
-## Key fixes applied
+### 7.To install the PWA:
 
-- `src/App.jsx`
-  - `syncUpload` 已修复旧状态读取问题；`hydrateFromIndexedDb` 兼容空数组场景。
-- `src/main.jsx`, `public/sw.js`, `public/manifest.webmanifest`
-  - 各种路径调整，支持 GitHub Pages 子路径部署。
-- `src/components/ReportEditor.jsx`
-  - `openCamera` 不可用时捕捉异常并提示。
+On desktop: Click the "Install App" button in the browser address bar.
+On mobile: Open the browser menu and select Add to Home Screen.
 
+### 8.Limitations
+Requires browser support for hardware APIs
+Camera access depends on user permission
+Performance may vary across devices
 
-## 已确认可用性验证
+### 9.Future Improvements
+Cloud synchronization
+Enhanced UI/UX
+Performance optimization
 
-- `npm run build` 通过，`vite build` 成功。
-
-
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+ 
