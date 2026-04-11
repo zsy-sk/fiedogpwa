@@ -16,11 +16,12 @@ FieldOG is a Progressive Web Application (PWA) purpose-built for field data coll
    - `react`, `react-dom`, `react-scripts`, `vite`
    - `react-leaflet`, `leaflet`, `jsqr`, `@testing-library/*`, etc.
 4.quick start
-1.nmp i
-2. Run `npm run dev`
-3. Open browser at `http://localhost:5173`、
-4. Sign up or log in
-5. Start creating reports
+1.download code from github,open the zip folder
+2.nmp i
+3. Run `npm run dev`
+4. Open browser at `http://localhost:5173`、
+5. Sign up or log in
+6. Start creating reports
 
 
 ### 2. Run instructions
