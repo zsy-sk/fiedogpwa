@@ -80,10 +80,34 @@ export default function List({ items, onRemove, onUpdate, categories }) {
     e.target.value = ''
   }
 
+  async function getGeo() {
+    return new Promise(resolve => {
+      if (!('geolocation' in navigator)) return resolve()
+      navigator.geolocation.getCurrentPosition(p => {
+        const next = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }
+        setEditGeo(next)
+        setEditPickerPoint(next)
+        resolve(next)
+      }, () => resolve(), { enableHighAccuracy: true, maximumAge: 10000, timeout: 8000 })
+    })
+  }
+
   function openEditLocation(item) {
     setEditPickerPoint({ lat: item.latitude, lng: item.longitude })
     setEditGeo({ lat: item.latitude, lng: item.longitude, acc: item.accuracy })
     setEditLocationOpen(true)
+  }
+
+  async function updateToCurrentLocation() {
+    await getGeo()
+  }
+
+  function closeEditLocation() {
+    // 清理orphan状态
+    setEditLocationOpen(false)
+    setEditPickerPoint(null)
+    setEditGeo({ lat: null, lng: null, acc: null })
+    setEditingId(null)
   }
 
   function applyEditLocation() {
@@ -93,7 +117,7 @@ export default function List({ items, onRemove, onUpdate, categories }) {
       longitude: editPickerPoint.lng,
       accuracy: editGeo.acc
     })
-    setEditLocationOpen(false)
+    closeEditLocation()
   }
 
   function openEditMedia(item) {
@@ -102,9 +126,17 @@ export default function List({ items, onRemove, onUpdate, categories }) {
     setEditMediaOpen(true)
   }
 
+  function closeEditMedia() {
+    // 清理orphan状态
+    setEditMediaOpen(false)
+    setEditMedia([])
+    setSelectedMediaIndex(0)
+    setEditingId(null)
+  }
+
   function saveEditMedia() {
     onUpdate(editingId, { media: editMedia })
-    setEditMediaOpen(false)
+    closeEditMedia()
   }
 
   return (
@@ -163,11 +195,11 @@ export default function List({ items, onRemove, onUpdate, categories }) {
       {!items.length && <div>No reports</div>}
 
       {editLocationOpen && (
-        <div className="modal-backdrop" onClick={() => setEditLocationOpen(false)}>
+        <div className="modal-backdrop" onClick={closeEditLocation}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <span>Edit Location</span>
-              <button onClick={() => setEditLocationOpen(false)}>Close</button>
+              <button onClick={closeEditLocation}>Close</button>
             </div>
             <div className="map-wrap">
               {editPickerPoint && (
@@ -184,6 +216,7 @@ export default function List({ items, onRemove, onUpdate, categories }) {
               <div>Accuracy: {editGeo.acc ? `${Math.round(editGeo.acc)}m` : '-'}</div>
             </div>
             <div className="hstack">
+              <button onClick={updateToCurrentLocation}>📍 Update Current GPS Location</button>
               <button onClick={applyEditLocation} className="btn-primary-lite">Save Location</button>
             </div>
           </div>
@@ -191,11 +224,11 @@ export default function List({ items, onRemove, onUpdate, categories }) {
       )}
 
       {editMediaOpen && (
-        <div className="modal-backdrop" onClick={() => setEditMediaOpen(false)}>
+        <div className="modal-backdrop" onClick={closeEditMedia}>
           <div className="modal camera-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <span>Edit Photos</span>
-              <button onClick={() => setEditMediaOpen(false)}>Close</button>
+              <button onClick={closeEditMedia}>Close</button>
             </div>
             <div className="camera-toolbar">
               <label className="file-pick">
