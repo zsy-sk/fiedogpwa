@@ -1,5 +1,7 @@
 # FieldOG PWA
 FieldOG is a Progressive Web Application (PWA) purpose-built for field data collection, which integrates device camera, QR code scanning, geolocation, and local storage to support an offline-first workflow. By leveraging multiple hardware APIs, the application provides a robust, installable solution that guarantees uninterrupted data capture and persistence in challenging network conditions.
+Note: The repository name (fiedogpwa) differs from the PWA app name (FieldOG), which is defined in the manifest for user-facing display purposes.
+
 
 ## Part A: User Guide
 
