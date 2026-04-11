@@ -1,9 +1,111 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { CircleMarker, MapContainer, TileLayer } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
 import { formatCoord, resolveMediaSrc } from '../utils/formatters.js'
+import MapCenterFollower from './MapCenterFollower.jsx'
 
 export default function List({ items, onRemove, onUpdate, categories }) {
   const [activeId, setActiveId] = useState(null)
+  const [editingId, setEditingId] = useState(null)
+  const [editPickerPoint, setEditPickerPoint] = useState(null)
+  const [editGeo, setEditGeo] = useState({ lat: null, lng: null, acc: null })
+  const [editMedia, setEditMedia] = useState([])
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0)
+  const [editLocationOpen, setEditLocationOpen] = useState(false)
+  const [editMediaOpen, setEditMediaOpen] = useState(false)
+  const canvasRef = useRef(null)
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
+  const albumLimitCount = 20
+  const albumLimitBytes = 15 * 1024 * 1024
   const categoryMap = new Map(categories.map(c => [Number(c.id), c.name]))
+
+  useEffect(() => {
+    canvasRef.current = document.createElement('canvas')
+  }, [])
+
+  function dataUrlBytes(dataUrl) {
+    if (!dataUrl || typeof dataUrl !== 'string') return 0
+    const parts = dataUrl.split(',')
+    if (parts.length < 2) return 0
+    return Math.floor((parts[1].length * 3) / 4)
+  }
+
+  function currentAlbumBytes(list) {
+    return list.reduce((sum, x) => sum + dataUrlBytes(x.data), 0)
+  }
+
+  function addMediaEntries(entries) {
+    setEditMedia(prev => {
+      const next = [...prev]
+      for (const entry of entries) {
+        if (next.length >= albumLimitCount) break
+        const bytes = currentAlbumBytes(next) + dataUrlBytes(entry.data)
+        if (bytes > albumLimitBytes) break
+        next.push(entry)
+      }
+      return next
+    })
+  }
+
+  function removeSelectedMedia() {
+    setEditMedia(prev => prev.filter((_, i) => i !== selectedMediaIndex))
+    setSelectedMediaIndex(prev => Math.max(0, prev - 1))
+  }
+
+  function clearAlbum() {
+    setEditMedia([])
+    setSelectedMediaIndex(0)
+  }
+
+  function setAsCover() {
+    setEditMedia(prev => {
+      if (!prev.length || selectedMediaIndex <= 0) return prev
+      const next = [...prev]
+      const [item] = next.splice(selectedMediaIndex, 1)
+      next.unshift(item)
+      setSelectedMediaIndex(0)
+      return next
+    })
+  }
+
+  async function onPickFiles(e) {
+    const files = Array.from(e.target.files || [])
+    const reads = await Promise.all(files.map(file => new Promise(resolve => {
+      const reader = new FileReader()
+      reader.onload = () => resolve({ mime_type: file.type || 'image/jpeg', data: String(reader.result || '') })
+      reader.readAsDataURL(file)
+    })))
+    addMediaEntries(reads)
+    e.target.value = ''
+  }
+
+  function openEditLocation(item) {
+    setEditPickerPoint({ lat: item.latitude, lng: item.longitude })
+    setEditGeo({ lat: item.latitude, lng: item.longitude, acc: item.accuracy })
+    setEditLocationOpen(true)
+  }
+
+  function applyEditLocation() {
+    if (!editPickerPoint) return
+    onUpdate(editingId, {
+      latitude: editPickerPoint.lat,
+      longitude: editPickerPoint.lng,
+      accuracy: editGeo.acc
+    })
+    setEditLocationOpen(false)
+  }
+
+  function openEditMedia(item) {
+    setEditMedia(item.media || [])
+    setSelectedMediaIndex(0)
+    setEditMediaOpen(true)
+  }
+
+  function saveEditMedia() {
+    onUpdate(editingId, { media: editMedia })
+    setEditMediaOpen(false)
+  }
 
   return (
     <div className="list">
@@ -37,9 +139,20 @@ export default function List({ items, onRemove, onUpdate, categories }) {
                   const text = window.prompt('Edit description', i.description || '')
                   if (text === null) return
                   onUpdate(i.id, { description: text })
-                }}
-                >
-                  Edit
+                }}>
+                  Edit Description
+                </button>
+                <button onClick={() => {
+                  setEditingId(i.id)
+                  openEditLocation(i)
+                }}>
+                  Edit Location
+                </button>
+                <button onClick={() => {
+                  setEditingId(i.id)
+                  openEditMedia(i)
+                }}>
+                  Edit Photos
                 </button>
                 <button onClick={() => onRemove(i.id)}>Delete</button>
               </div>
@@ -48,6 +161,64 @@ export default function List({ items, onRemove, onUpdate, categories }) {
         </div>
       ))}
       {!items.length && <div>No reports</div>}
+
+      {editLocationOpen && (
+        <div className="modal-backdrop" onClick={() => setEditLocationOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <span>Edit Location</span>
+              <button onClick={() => setEditLocationOpen(false)}>Close</button>
+            </div>
+            <div className="map-wrap">
+              {editPickerPoint && (
+                <MapContainer center={[editPickerPoint.lat, editPickerPoint.lng]} zoom={17} className="map-box">
+                  <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <CircleMarker center={[editPickerPoint.lat, editPickerPoint.lng]} radius={8} pathOptions={{ color: '#1e66ff', fillColor: '#1e66ff', fillOpacity: 0.9 }} />
+                  <MapCenterFollower onCenterChange={(lat, lng) => setEditPickerPoint({ lat, lng })} />
+                </MapContainer>
+              )}
+            </div>
+            <div className="grid">
+              <div>Latitude: {editPickerPoint?.lat?.toFixed?.(6) || '-'}</div>
+              <div>Longitude: {editPickerPoint?.lng?.toFixed?.(6) || '-'}</div>
+              <div>Accuracy: {editGeo.acc ? `${Math.round(editGeo.acc)}m` : '-'}</div>
+            </div>
+            <div className="hstack">
+              <button onClick={applyEditLocation} className="btn-primary-lite">Save Location</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editMediaOpen && (
+        <div className="modal-backdrop" onClick={() => setEditMediaOpen(false)}>
+          <div className="modal camera-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <span>Edit Photos</span>
+              <button onClick={() => setEditMediaOpen(false)}>Close</button>
+            </div>
+            <div className="camera-toolbar">
+              <label className="file-pick">
+                <span>Add photos</span>
+                <input type="file" accept="image/*" multiple onChange={onPickFiles} />
+              </label>
+            </div>
+            <div className="album-meta">Album: {editMedia.length}/{albumLimitCount} images, about {(currentAlbumBytes(editMedia) / (1024 * 1024)).toFixed(2)}MB</div>
+            {editMedia[selectedMediaIndex] && <img className="album-cover" src={editMedia[selectedMediaIndex].data} alt="" />}
+            <div className="hstack album-actions">
+              <button onClick={setAsCover}>Set cover</button>
+              <button onClick={removeSelectedMedia}>Remove selected</button>
+              <button onClick={clearAlbum}>Clear album</button>
+            </div>
+            <div className="thumbs">
+              {editMedia.map((m, i) => <img key={i} src={m.data} alt="" className={i === selectedMediaIndex ? 'thumb-active' : ''} onClick={() => setSelectedMediaIndex(i)} />)}
+            </div>
+            <div className="hstack">
+              <button onClick={saveEditMedia} className="btn-primary-lite">Save Photos</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
