@@ -81,8 +81,10 @@ Camera access depends on user permission
 Performance may vary across devices
 
 ### 9.Future Improvements
-Cloud synchronization
-Enhanced UI/UX
-Performance optimization
+Implement persistent offline map caching to eliminate navigation interruptions in remote, low-signal areas.
+Enhance offline data conflict resolution to improve multi-device usage reliability.
+Build analytics dashboards to turn raw field data into actionable insights, extending the app’s value beyond basic reporting.
+
+
 
  
