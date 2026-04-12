@@ -103,7 +103,7 @@ export default function List({ items, onRemove, onUpdate, categories }) {
   }
 
   function closeEditLocation() {
-    // 清理orphan状态
+  
     setEditLocationOpen(false)
     setEditPickerPoint(null)
     setEditGeo({ lat: null, lng: null, acc: null })
@@ -127,7 +127,7 @@ export default function List({ items, onRemove, onUpdate, categories }) {
   }
 
   function closeEditMedia() {
-    // 清理orphan状态
+  
     setEditMediaOpen(false)
     setEditMedia([])
     setSelectedMediaIndex(0)
